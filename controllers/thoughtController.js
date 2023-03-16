@@ -39,6 +39,51 @@ const thoughtController = {
             });
     },
 
+    // GET all thoughts by a specific user
+    getThoughts({ params }, res) {
+        Thought.find({ username: params.username })
+            .populate({
+                path: 'reactions',
+                select: '-__v'
+            })
+            .select('-__v')
+            .sort({ createdAt: -1 })
+            .then(dbThoughtData => {
+                // If no thoughts are found, send 404 status
+                if (dbThoughtData.length === 0) {
+                    res.status(404).json({ message: 'No thoughts found for this user!' });
+                    return;
+                }
+                res.json(dbThoughtData);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+            });
+    },
+
+    // GET a single thought by ID and username
+    getSingleThought({ params }, res) {
+        Thought.findOne({ _id: params.thoughtId, username: params.username })
+            .populate({
+                path: 'reactions',
+                select: '-__v'
+            })
+            .select('-__v')
+            .then(dbThoughtData => {
+                // If no thought is found, send 404 status
+                if (!dbThoughtData) {
+                    res.status(404).json({ message: 'No thought found with this id and username!' });
+                    return;
+                }
+                res.json(dbThoughtData);
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(400).json(err);
+            });
+    },
+
     // CREATE a new thought
     createThought({ body }, res) {
         Thought.create(body)
@@ -83,7 +128,7 @@ const thoughtController = {
                     res.status(404).json({ message: 'No thought found with this id!' });
                     return;
                 }
-                // Remove thought from the user's `thoughts` array field
+                // Remove thought id from the corresponding user's `thoughts` array
                 return User.findOneAndUpdate(
                     { username: dbThoughtData.username },
                     { $pull: { thoughts: params.thoughtId } },
@@ -101,7 +146,7 @@ const thoughtController = {
             .catch(err => res.status(400).json(err));
     },
 
-    // CREATE a new reaction to a thought
+    // CREATE a new reaction
     createReaction({ params, body }, res) {
         Thought.findOneAndUpdate(
             { _id: params.thoughtId },
@@ -124,7 +169,7 @@ const thoughtController = {
             .catch(err => res.status(400).json(err));
     },
 
-    // DELETE a reaction to a thought
+    // DELETE a reaction
     deleteReaction({ params }, res) {
         Thought.findOneAndUpdate(
             { _id: params.thoughtId },
