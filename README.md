@@ -1,2 +1,2 @@
-# ch-18-NOSQL
-Challenge 18 for NOSQL
+# Social Network API / Mongo
+Challenge 18 for OSU boot camp
