@@ -1,3 +1,5 @@
+//ThoughtRoutes
+
 const router = require('express').Router();
 const {
   getThoughts,
