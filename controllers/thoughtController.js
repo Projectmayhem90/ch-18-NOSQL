@@ -42,7 +42,7 @@ const thoughtController = {
 
     // GET all thoughts by a specific user
     getThoughts({ params }, res) {
-        Thought.find({ username: params.username })
+        Thought.find()
             .populate({
                 path: 'reactions',
                 select: '-__v'
@@ -65,7 +65,7 @@ const thoughtController = {
 
     // GET a single thought by ID and username
     getSingleThought({ params }, res) {
-        Thought.findOne({ _id: params.thoughtId, username: params.username })
+        Thought.findOne({ _id: params.thoughtId})
             .populate({
                 path: 'reactions',
                 select: '-__v'
@@ -171,10 +171,10 @@ const thoughtController = {
     },
 
     // DELETE a reaction
-    deleteReaction({ params }, res) {
+    deleteReaction(req, res) {
         Thought.findOneAndUpdate(
-            { _id: params.thoughtId },
-            { $pull: { reactions: { reactionId: params.reactionId } } },
+            { _id: req.params.thoughtId },
+            { $pull: { reactions: { reactionId: req.params.reactionId } } },
             { new: true }
         )
             .populate({
@@ -186,7 +186,6 @@ const thoughtController = {
                 // If no thought is found, send 404 status
                 if (!dbThoughtData) {
                     res.status(404).json({ message: 'No thought found with this id!' });
-                    return;
                 }
                 res.json(dbThoughtData);
             })

@@ -1,11 +1,13 @@
 //Thought Model
 
-const mongoose = require('mongoose');
+const { Schema, model, Types} = require('mongoose');
 const dayjs = require('dayjs');
 
-const  Schema  = mongoose.Schema;
-
 const reactionSchema = new Schema({
+  reactionId: {
+    type: Schema.Types.ObjectId,
+    default: () => new Types.ObjectId
+  },
   reactionBody: {
     type: String,
     required: true,
@@ -45,6 +47,6 @@ thoughtSchema.virtual('reactionCount').get(function () {
   return this.reactions.length;
 });
 
-const Thought = mongoose.model('Thought', thoughtSchema);
+const Thought = model('Thought', thoughtSchema);
 
 module.exports = Thought;
